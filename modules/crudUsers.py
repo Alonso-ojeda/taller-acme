@@ -95,7 +95,7 @@ def listarUsuarios(datos_sistema):
 
 def modificarUsuario(datos_sistema):
     print('\n--- EDITAR DATOS DE OPERARIO ---')
-    # Pedimos el ID para buscarlo
+    # Pedimos el ID para buscarlo (este sí es obligatorio)
     id_buscar = cr.leer_entero_obligatorio('Ingrese el ID del operario que desea modificar: ')
     
     usuario_encontrado = None
@@ -106,40 +106,65 @@ def modificarUsuario(datos_sistema):
             
     if usuario_encontrado:
         print(f"\nUsuario encontrado: {usuario_encontrado['nombre'].capitalize()} {usuario_encontrado['apellido'].capitalize()}")
-        print("Ingrese los nuevos datos para actualizar la información. (El ID no se puede modificar).\n")
+        print("Presione [ENTER] para conservar el valor actual si no desea modificarlo.\n")
         
-        usuario_encontrado['nombre'] = cr.leer_texto_obligatorio('Nuevo nombre: ').strip().lower()
-        usuario_encontrado['apellido'] = cr.leer_texto_obligatorio('Nuevo apellido: ').strip().lower()
-        usuario_encontrado['telefono'] = cr.leer_entero_obligatorio('Nuevo teléfono: ')
-        
-        # para evitar correos duplicados o sin '@' al modificar
+        # REQUERIMIENTO PROFESOR: Modificar Nombre de forma opcional
+        cambio = input(f"Nuevo nombre ({usuario_encontrado['nombre']}): ").strip().lower()
+        if cambio != '':
+            usuario_encontrado['nombre'] = cambio
+
+        # REQUERIMIENTO PROFESOR: Modificar Apellido de forma opcional
+        cambio = input(f"Nuevo apellido ({usuario_encontrado['apellido']}): ").strip().lower()
+        if cambio != '':
+            usuario_encontrado['apellido'] = cambio
+
+        # REQUERIMIENTO PROFESOR: Modificar Teléfono de forma opcional
         while True:
-            nuevo_email = cr.leer_texto_obligatorio('Nuevo correo electrónico: ').strip().lower()
-            # ESCUDO PREMIUM: Estructura real de correo al modificar
-            if "@" not in nuevo_email or "." not in nuevo_email or nuevo_email.endswith("@") or nuevo_email.endswith("."):
+            cambio = input(f"Nuevo teléfono ({usuario_encontrado['telefono']}): ").strip()
+            if cambio == '':
+                break # Conserva el actual
+            try:
+                usuario_encontrado['telefono'] = int(cambio)
+                break
+            except ValueError:
+                print('[ERROR]: Entrada no válida. Debe ingresar un número entero o presionar [ENTER].')
+        
+        # REQUERIMIENTO PROFESOR: Modificar Correo electrónico de forma opcional
+        while True:
+            cambio = input(f"Nuevo correo electrónico ({usuario_encontrado['email']}): ").strip().lower()
+            if cambio == '':
+                break # Conserva el actual
+                
+            if "@" not in cambio or "." not in cambio or cambio.endswith("@") or cambio.endswith("."):
                 print("[ERROR]: El formato del correo no es válido (ejemplo: usuario@correo.com).")
                 continue
                 
-            if nuevo_email == usuario_encontrado['email']:
-                break # Dejó su mismo correo actual, es completamente válido
+            if cambio == usuario_encontrado['email']:
+                break
                 
-            # Verificamos que este nuevo correo no le pertenezca a otra persona
+            # Verificar duplicados con otros usuarios
             correo_repetido = False
             for usr in datos_sistema['usuarios']:
-                if usr['email'] == nuevo_email:
-                    print(f"\n[ERROR]: El correo '{nuevo_email}' ya le pertenece a otro operario. Intente otro.\n")
+                if usr['email'] == cambio:
+                    print(f"\n[ERROR]: El correo '{cambio}' ya le pertenece a otro operario. Intente otro.\n")
                     correo_repetido = True
                     break
             if not correo_repetido:
-                usuario_encontrado['email'] = nuevo_email
+                usuario_encontrado['email'] = cambio
                 break
 
-        usuario_encontrado['password'] = cr.leer_texto_obligatorio('Nueva contraseña: ').strip()
+        # REQUERIMIENTO PROFESOR: Modificar Contraseña de forma opcional
+        cambio = input(f"Nueva contraseña ({usuario_encontrado['password']}): ").strip()
+        if cambio != '':
+            usuario_encontrado['password'] = cambio
         
+        # REQUERIMIENTO PROFESOR: Modificar Rol de forma opcional
         while True:
-            rol = input('Nuevo rol (administrador o operario): ').strip().lower()
-            if rol == 'administrador' or rol == 'operario':
-                usuario_encontrado['rol'] = rol
+            cambio = input(f"Nuevo rol ({usuario_encontrado['rol']} - administrador/operario): ").strip().lower()
+            if cambio == '':
+                break # Conserva el actual
+            if cambio == 'administrador' or cambio == 'operario':
+                usuario_encontrado['rol'] = cambio
                 break
             else:
                 print('\n[ERROR]: Rol no válido. Intente de nuevo.\n')

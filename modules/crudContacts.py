@@ -70,7 +70,7 @@ def listarContactos(datos_sistema):
 
 def modificarContacto(datos_sistema):
     print('\n--- MODIFICAR / EDITAR CONTACTO ---')
-    # Se busca obligatoriamente mediante el ID de tipo int
+    # Se busca obligatoriamente mediante el ID
     id_buscar = cr.leer_entero_obligatorio('Ingrese el ID del contacto que desea editar: ')
     
     contacto_encontrado = None
@@ -81,35 +81,49 @@ def modificarContacto(datos_sistema):
             
     if contacto_encontrado:
         print(f"\nContacto encontrado: {contacto_encontrado['nombre'].capitalize()} {contacto_encontrado['apellido'].capitalize()}")
-        print('Ingrese los nuevos datos para actualizar. (El ID no se puede modificar).\n')
+        print('Presione [ENTER] para conservar el valor actual si no desea modificarlo.\n')
         
-        # El ID se queda totalmente protegido e intacto, no permitimos que se altere
-        contacto_encontrado['nombre'] = cr.leer_texto_obligatorio('Nuevo nombre: ').strip().lower()
-        contacto_encontrado['apellido'] = cr.leer_texto_obligatorio('Nuevo apellido: ').strip().lower()
+        # REQUERIMIENTO PROFESOR: Modificar Nombre de forma opcional
+        cambio = input(f"Nuevo nombre ({contacto_encontrado['nombre']}): ").strip().lower()
+        if cambio != '':
+            contacto_encontrado['nombre'] = cambio
+
+        # REQUERIMIENTO PROFESOR: Modificar Apellido de forma opcional
+        cambio = input(f"Nuevo apellido ({contacto_encontrado['apellido']}): ").strip().lower()
+        if cambio != '':
+            contacto_encontrado['apellido'] = cambio
         
-        # Validamos que el nuevo teléfono (int) tampoco choque con el de alguien más al editar
+        # REQUERIMIENTO PROFESOR: Modificar Teléfono con validación opcional
         while True:
-            nuevo_tel = cr.leer_entero_obligatorio('Nuevo teléfono: ')
-            if nuevo_tel == contacto_encontrado['telefono']: 
-                break # Dejó el mismo número actual, es completamente válido
-                
-            duplicado = False
-            for con in datos_sistema['contactos']:
-                if con['telefono'] == nuevo_tel:
-                    print(f"\n[ERROR]: Ese número ya le pertenece a {con['nombre'].capitalize()}. Intente otro.\n")
-                    duplicado = True
+            cambio = input(f"Nuevo teléfono ({contacto_encontrado['telefono']}): ").strip()
+            if cambio == '':
+                break # Conserva el actual
+            try:
+                nuevo_tel = int(cambio)
+                if nuevo_tel == contacto_encontrado['telefono']: 
                     break
-            if not duplicado:
-                contacto_encontrado['telefono'] = nuevo_tel
-                break
+                    
+                duplicado = False
+                for con in datos_sistema['contactos']:
+                    if con['telefono'] == nuevo_tel:
+                        print(f"\n[ERROR]: Ese número ya le pertenece a {con['nombre'].capitalize()}. Intente otro.\n")
+                        duplicado = True
+                        break
+                if not duplicado:
+                    contacto_encontrado['telefono'] = nuevo_tel
+                    break
+            except ValueError:
+                print('[ERROR]: Entrada no válida. Debe ingresar un número entero o presionar [ENTER].')
                 
-        # ESCUDO PREMIUM: Agregada validación de formato de correo con '@' y '.' al modificar contacto
+        # REQUERIMIENTO PROFESOR: Modificar Correo de forma opcional
         while True:
-            nuevo_email = cr.leer_texto_obligatorio('Nuevo correo electrónico: ').strip().lower()
-            if "@" not in nuevo_email or "." not in nuevo_email or nuevo_email.endswith("@") or nuevo_email.endswith("."):
-                print("[ERROR]: El formato del correo no es válido (debe incluir '@' y un dominio válido).")
+            cambio = input(f"Nuevo correo electrónico ({contacto_encontrado['email']}): ").strip().lower()
+            if cambio == '':
+                break # Conserva el actual
+            if "@" not in cambio or "." not in cambio or cambio.endswith("@") or cambio.endswith("."):
+                print("[ERROR]: El formato del correo no es válido (ejemplo: contacto@correo.com).")
                 continue
-            contacto_encontrado['email'] = nuevo_email
+            contacto_encontrado['email'] = cambio
             break
         
         cr.guardar_datos(datos_sistema)
