@@ -1,0 +1,20 @@
+{
+    "mensaje_global": "Inconsistencias de datos detectadas.",
+    "usuarios_con_errores": [
+        {
+            "email_o_id": "alonso@acme.com",
+            "errores": [
+                "Falta el campo obligatorio o está vacío: direccion"
+            ]
+        }
+    ],
+    "contactos_con_errores": [],
+    "resumen": {
+        "total_usuarios": 2,
+        "total_contactos": 0,
+        "usuarios_con_errores": 1,
+        "contactos_con_errores": 0,
+        "usuarios_con_email_duplicado": 0,
+        "contactos_con_id_duplicado": 0
+    }
+}

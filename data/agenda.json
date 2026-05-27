@@ -17,7 +17,7 @@
             "telefono": 30124214,
             "email": "alonso@acme.com",
             "password": "alonso123",
-            "rol": "operario"
+            "rol": "administrador"
         }
     ],
     "contactos": []

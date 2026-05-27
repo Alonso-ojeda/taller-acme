@@ -4,7 +4,8 @@ def menuAdministrador ():
     print('============================================')
     print('1. Gestionar usuarios (operarios)')
     print('2. Gestionar contactos')
-    print('3. Cerrar Sesion / Salir')
+    print('3. Ejecutar Auditoria de Datos')
+    print('4. Cerrar Sesion / Salir')
     print('============================================')
 
 def menuOperario():

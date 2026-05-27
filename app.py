@@ -2,6 +2,7 @@ import modules.core as cr
 import modules.crudUsers as usr
 import modules.messages as msg
 import modules.crudContacts as con
+import modules.auditoria as aud # cargamos el modulo nuevo de auditoria
 
 if __name__ == '__main__': # para que se ejecute solo desde esta pantalla 
     print('bienvenido al programa de acme para una mejor gestion')
@@ -65,7 +66,11 @@ if __name__ == '__main__': # para que se ejecute solo desde esta pantalla
                     else:
                         print('\nOpcion no valida intente nuevamente.')
 
+            # Nueva opcion para ejecutar el modulo de auditoria sin tocar el json original
             elif opcion == '3':
+                aud.auditar_datos()
+
+            elif opcion == '4':
                 print('\nCerrando sesion.')
                 break # este break rompe el bucle del while
             
